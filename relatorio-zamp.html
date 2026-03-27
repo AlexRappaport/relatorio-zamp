@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatório Zamp</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23313131'/%3E%3Cg transform='translate(10,10) scale(0.22)'%3E%3Cpath d='M81.08 69.94C51.23 100.14 32.8 141.64 32.8 187.47C32.8 233.29 51.23 274.79 81.08 304.99C33.69 287 0 241.17 0 187.47C0 133.77 33.69 87.93 81.08 69.94Z' fill='%23F5F5F5'/%3E%3Cpath d='M361.49 148.01C350.99 106.87 324.9 69.7 285.62 46.1C246.35 22.5 201.26 16.92 160.03 26.95C199.84 -4.42 256.49 -9.7 302.52 17.97C348.55 45.62 370.49 98.1 361.49 148.01Z' fill='%23F5F5F5'/%3E%3Cpath d='M361.49 231.13C350.99 272.27 324.9 309.45 285.62 333.05C246.35 356.65 201.26 362.22 160.03 352.2C199.84 383.56 256.49 388.84 302.52 361.18C348.55 333.52 370.49 281.04 361.49 231.13Z' fill='%23F5F5F5'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --dark: #313131;
+  --light: #F5F5F5;
+  --tl: #F5F5F5;
+  --td: #222222;
+  --md: #888780;
+  --ml: #666460;
+  --orange: #FFBA86;
+  --blue: #8AA5FF;
+}
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--tl); }
+
+/* BG */
+.bg-arc {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at 50% 120%, rgba(138,165,255,.12) 0%, rgba(255,186,134,.05) 40%, transparent 70%);
+}
+
+/* PROGRESS */
+.progress-bar {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px;
+  background: rgba(255,255,255,.08); z-index: 100;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--orange), var(--blue));
+  transition: width .5s ease;
+}
+.progress-label {
+  position: fixed; top: 16px; right: 24px; z-index: 100;
+  font-size: .65rem; font-weight: 500; letter-spacing: .12em;
+  text-transform: uppercase; color: rgba(255,255,255,.3);
+}
+.progress-label.dark-text { color: rgba(0,0,0,.3); }
+
+/* LOGO FIXED */
+.logo-fixed {
+  position: fixed; top: 20px; left: 24px; z-index: 100;
+  height: 18px; width: auto;
+  transition: opacity .3s;
+}
+
+/* SCREENS */
+.screens { position: relative; width: 100%; height: 100vh; overflow: hidden; }
+.screen {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 5rem 2rem 6rem;
+  opacity: 0; pointer-events: none;
+  transition: opacity .5s ease, transform .5s ease;
+  transform: translateX(40px);
+  z-index: 1;
+}
+.screen.active {
+  opacity: 1; pointer-events: all;
+  transform: translateX(0);
+  z-index: 2;
+}
+.screen.exit-left { opacity: 0; transform: translateX(-40px); z-index: 1; }
+.screen.light { background: var(--light); color: var(--td); }
+.screen.dark  { background: var(--dark);  color: var(--tl); }
+
+.w  { width: 100%; max-width: 1100px; margin: 0 auto; }
+.wn { width: 100%; max-width: 720px;  margin: 0 auto; }
+
+/* NAV BUTTONS */
+.nav {
+  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 1rem; z-index: 100;
+}
+.nav-btn {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-family: 'Inter', sans-serif; font-size: .8rem; font-weight: 400;
+  padding: .65rem 1.5rem; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,.2);
+  color: rgba(255,255,255,.7); background: transparent;
+  cursor: pointer; letter-spacing: .02em;
+  transition: all .2s; position: relative; overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+.nav-btn::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--orange), var(--blue));
+  opacity: 0; transition: opacity .2s;
+}
+.nav-btn:hover { border-color: transparent; color: #fff; }
+.nav-btn:hover::before { opacity: 1; }
+.nav-btn span { position: relative; z-index: 1; }
+.nav-btn:disabled { opacity: .25; cursor: not-allowed; }
+.nav-btn:disabled:hover::before { opacity: 0; }
+.nav-btn:disabled:hover { border-color: rgba(255,255,255,.2); color: rgba(255,255,255,.7); }
+.nav-dots {
+  display: flex; gap: .4rem; align-items: center;
+}
+.nav-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: rgba(255,255,255,.25); transition: all .3s;
+  cursor: pointer;
+}
+.nav-dot.active { background: var(--orange); width: 16px; border-radius: 2px; }
+
+/* TYPOGRAPHY */
+.label {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: .65rem; font-weight: 500; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--md); margin-bottom: 1.25rem;
+}
+.screen.light .label { color: var(--ml); }
+.label::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
+.label::after  { content: ''; width: 20px; height: 1px; background: currentColor; opacity: .4; }
+
+.h1 { font-family: 'Libre Caslon Text', serif; font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.12; font-weight: 400; margin-bottom: 1.5rem; }
+.h2 { font-family: 'Libre Caslon Text', serif; font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.12; font-weight: 400; margin-bottom: 1.25rem; }
+.h-huge { font-family: 'Libre Caslon Text', serif; font-size: clamp(4rem, 10vw, 8rem); line-height: 1; font-weight: 400; margin-bottom: .75rem; }
+.body { font-size: 1rem; font-weight: 300; line-height: 1.8; opacity: .65; max-width: 520px; }
+.tag {
+  display: inline-block; font-size: .68rem; font-weight: 500; letter-spacing: .12em;
+  text-transform: uppercase; padding: .35rem .9rem; border-radius: 100px;
+  border: 1px solid rgba(255,186,134,.35); color: var(--orange);
+  background: rgba(255,186,134,.08); margin-bottom: 2rem;
+}
+
+/* TELA 1 - COVER */
+.cover-logos {
+  display: flex; align-items: center; gap: 1.5rem; margin-bottom: 3.5rem;
+}
+.logo-divider { width: 1px; height: 20px; background: rgba(255,255,255,.18); }
+/* Neutral filter for brand logos */
+.logo-neutral { filter: brightness(0) invert(1); }
+
+/* TELA 2 - MARCAS */
+.marcas-grid { display: flex; flex-direction: column; gap: .875rem; width: 100%; max-width: 560px; }
+.marca-card {
+  padding: 1.4rem 1.75rem;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px; background: rgba(255,255,255,.03);
+  display: flex; align-items: center; justify-content: space-between; gap: 2rem;
+  transition: border-color .25s, background .25s;
+}
+.marca-card:hover { border-color: rgba(255,186,134,.25); background: rgba(255,255,255,.05); }
+.marca-logo { display: flex; align-items: center; }
+.marca-count {
+  text-align: right;
+}
+.marca-count-num {
+  font-family: 'Libre Caslon Text', serif;
+  font-size: 1.6rem; line-height: 1; color: var(--tl);
+  display: block;
+}
+.marca-count-label {
+  font-size: .62rem; font-weight: 500; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--orange); opacity: .65;
+}
+
+/* TELA 3,4 - KPIs */
+.kpi-row { display: flex; gap: 1px; margin: 2rem 0; }
+.kpi-block {
+  flex: 1; padding: 2rem 1.75rem;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+}
+.kpi-block + .kpi-block { margin-left: 1px; border-radius: 14px; }
+.kpi-row-light .kpi-block {
+  background: white;
+  border-color: rgba(0,0,0,.1);
+}
+.kpi-n {
+  font-family: 'Libre Caslon Text', serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem); line-height: 1;
+  color: var(--tl); margin-bottom: .4rem; display: block;
+}
+.kpi-row-light .kpi-n { color: var(--td); }
+.kpi-l { font-size: .65rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--md); display: block; margin-bottom: .3rem; }
+.kpi-row-light .kpi-l { color: var(--ml); }
+.kpi-x { font-size: .72rem; font-weight: 300; color: rgba(255,255,255,.35); line-height: 1.5; }
+.kpi-row-light .kpi-x { color: var(--ml); }
+.kpi-accent { color: #B8783A !important; font-weight: 500; }
+
+/* TELA 6 - DESTAQUE */
+.destaque-num { font-family: 'Libre Caslon Text', serif; font-size: clamp(5rem, 16vw, 12rem); line-height: 1; color: var(--tl); margin-bottom: 1rem; }
+.destaque-vs {
+  display: flex; align-items: center; gap: 2rem; margin-top: 2rem;
+  padding: 1.25rem 2rem; border: 1px solid rgba(255,186,134,.25);
+  border-radius: 14px; background: rgba(255,186,134,.04);
+  max-width: 480px;
+}
+.destaque-vs-item { text-align: center; }
+.destaque-vs-val { font-family: 'Libre Caslon Text', serif; font-size: 1.5rem; display: block; margin-bottom: .2rem; }
+.destaque-vs-val.orange { color: var(--orange); }
+.destaque-vs-val.muted  { color: rgba(255,255,255,.3); }
+.destaque-vs-label { font-size: .62rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--md); }
+.destaque-vs-divider { width: 1px; height: 40px; background: rgba(255,255,255,.1); }
+
+/* TELA 7 - FINANCEIRO */
+.fin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin: 2rem 0; width: 100%; }
+.fin-card {
+  padding: 1.75rem 2rem; border: 1px solid rgba(0,0,0,.1);
+  border-radius: 16px; background: white; position: relative; overflow: hidden;
+}
+.fin-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px; background: linear-gradient(90deg, var(--orange), var(--blue));
+}
+.fin-label { font-size: .62rem; font-weight: 500; letter-spacing: .13em; text-transform: uppercase; color: var(--ml); margin-bottom: 1rem; }
+.fin-big { font-family: 'Libre Caslon Text', serif; font-size: clamp(1.3rem, 2.2vw, 1.75rem); color: var(--td); margin-bottom: .5rem; line-height: 1.2; }
+.fin-sub { font-size: .78rem; color: var(--ml); font-weight: 300; line-height: 1.7; margin-bottom: 1rem; }
+.fin-tag { display: inline-block; font-size: .62rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; padding: .3rem .75rem; border-radius: 100px; border: 1px solid rgba(82,160,94,.3); color: #52a05e; background: rgba(82,160,94,.08); }
+
+/* TELA 8 - AMBIENTAL */
+.env-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; overflow: hidden; margin: 2rem 0; width: 100%; }
+.env-card { padding: 2rem 1.75rem; background: rgba(255,255,255,.025); display: flex; flex-direction: column; gap: .5rem; }
+.env-icon { font-size: 1.25rem; }
+.env-n { font-family: 'Libre Caslon Text', serif; font-size: clamp(1.6rem, 3vw, 2.25rem); line-height: 1; color: var(--tl); }
+.env-l { font-size: .62rem; font-weight: 500; letter-spacing: .09em; text-transform: uppercase; color: var(--md); }
+.env-x { font-size: .72rem; font-weight: 300; color: rgba(255,255,255,.35); line-height: 1.5; }
+
+/* TELA 9 - PRÓXIMOS PASSOS */
+.steps { display: flex; flex-direction: column; gap: 1px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; overflow: hidden; margin: 1.75rem 0; width: 100%; }
+.step { padding: 1.4rem 1.75rem; background: rgba(255,255,255,.025); display: flex; align-items: flex-start; gap: 1.25rem; transition: background .2s; }
+.step:hover { background: rgba(255,255,255,.04); }
+.step-n { font-family: 'Libre Caslon Text', serif; font-size: 1.3rem; color: rgba(255,186,134,.3); flex-shrink: 0; line-height: 1; padding-top: .1rem; }
+.step-t { font-size: .88rem; font-weight: 500; color: var(--tl); margin-bottom: .25rem; }
+.step-d { font-size: .78rem; font-weight: 300; color: rgba(255,255,255,.4); line-height: 1.6; }
+
+/* TELA 10 - ENCERRAMENTO */
+.closing-quote { font-family: 'Libre Caslon Text', serif; font-size: clamp(1.5rem, 3.5vw, 2.5rem); line-height: 1.3; font-weight: 400; font-style: italic; color: rgba(255,255,255,.75); margin-bottom: 1.5rem; max-width: 600px; }
+.closing-name { font-size: .78rem; color: var(--md); letter-spacing: .06em; margin-bottom: 3rem; }
+.btn-cta {
+  display: inline-flex; align-items: center;
+  font-size: .875rem; font-weight: 400; padding: .85rem 2.25rem;
+  border-radius: 100px; border: 1px solid rgba(255,255,255,.25);
+  color: var(--tl); background: transparent; cursor: pointer;
+  text-decoration: none; transition: all .25s; position: relative; overflow: hidden;
+}
+.btn-cta::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, var(--orange), var(--blue)); opacity: 0; transition: opacity .25s; }
+.btn-cta:hover { border-color: transparent; }
+.btn-cta:hover::before { opacity: 1; }
+.btn-cta span { position: relative; z-index: 1; }
+
+/* HIGHLIGHT CARD */
+.hl {
+  border: 1px solid rgba(255,186,134,.25); border-radius: 14px;
+  padding: 1.25rem 1.75rem; background: rgba(255,186,134,.04);
+  position: relative; overflow: hidden; margin-top: 1.25rem; max-width: 560px;
+}
+.hl::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--orange), var(--blue)); }
+.hl p { font-size: .88rem; font-weight: 300; line-height: 1.8; color: rgba(255,255,255,.65); }
+.hl strong { color: var(--orange); font-weight: 500; }
+
+/* PILLS */
+.pills { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.5rem; }
+.pill { font-size: .68rem; padding: .3rem .8rem; border-radius: 100px; border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.45); }
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  .fin-grid { grid-template-columns: 1fr; }
+  .env-grid { grid-template-columns: 1fr; }
+  .kpi-row { flex-direction: column; }
+  .destaque-num { font-size: clamp(4rem, 18vw, 7rem); }
+}
+@media (max-width: 500px) {
+  .screen { padding: 4rem 1.25rem 5.5rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-arc"></div>
+
+<!-- PROGRESS -->
+<div class="progress-bar"><div class="progress-fill" id="pf" style="width:10%"></div></div>
+<div class="progress-label" id="pl">1 / 10</div>
+
+<!-- MUSA LOGO FIXO -->
+<svg class="logo-fixed" id="logo-fixed" viewBox="0 0 1386 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M619.536 222.823L538.313 58.6137H490.43V316.574H516.289V72.4741L593.094 231.131H646.067L722.773 72.4741V316.574H748.632V58.6137H700.749L619.525 222.823H619.536Z" fill="#F5F5F5"/>
+  <path d="M941.869 215.651C941.869 239.395 935.589 258.4 923.04 272.646C910.491 286.903 893.556 294.01 872.281 294.01C855.787 294.01 843.117 288.732 834.247 278.177C825.367 267.622 820.938 252.451 820.938 232.663V115.896H795.839V237.411C795.839 262.488 801.668 282.607 813.336 297.778C824.992 312.95 842.863 320.541 866.959 320.541C886.736 320.541 907.968 314.492 921.211 303.485C934.454 292.478 937.914 286.683 941.869 277.439V316.574H967.343V115.907H941.869V215.651Z" fill="#F5F5F5"/>
+  <path d="M1149.23 222.514C1137.7 214.989 1123.05 209.656 1105.31 206.483L1077.94 201.338C1062.22 198.44 1051.25 194.672 1045.05 190.067C1038.83 185.45 1035.73 178.531 1035.73 169.287C1035.73 158.732 1040.03 150.557 1048.65 144.739C1057.27 138.944 1068.67 136.035 1082.87 136.035C1100.1 136.035 1113.54 140.002 1123.19 147.913C1132.8 155.823 1137.88 166.643 1138.4 180.371H1164.63C1163.62 159.008 1156.21 142.238 1142.39 130.097C1128.57 117.955 1109.24 111.895 1084.39 111.895C1062.33 111.895 1044.46 116.842 1030.77 126.736C1017.07 136.63 1010.24 150.953 1010.24 169.684C1010.24 187.367 1015.31 200.027 1025.46 207.684C1035.59 215.342 1050.17 221.005 1069.19 224.707L1098.85 230.249C1114.82 233.411 1125.85 237.377 1131.92 242.126C1138.02 246.875 1141.05 253.871 1141.05 263.104C1141.05 273.923 1136.74 282.176 1128.12 287.85C1119.51 293.524 1107.72 296.355 1092.75 296.355C1075.26 296.355 1060.93 292.345 1049.77 284.28C1038.61 276.237 1032.92 265.351 1032.66 251.623H1006.8C1007.31 272.733 1015.23 289.491 1030.58 301.897C1045.91 314.304 1066.13 320.496 1091.23 320.496C1113.8 320.496 1131.99 315.548 1145.8 305.654C1159.62 295.761 1166.54 281.437 1166.54 262.707C1166.54 243.977 1160.77 230.05 1149.24 222.525L1149.23 222.514Z" fill="#F5F5F5"/>
+  <path d="M1378.37 290.009C1374.56 290.009 1371.59 289.414 1370.06 287.563C1368.55 285.712 1368.09 282.098 1368.09 277.35V189.879C1368.09 137.886 1339.95 111.895 1283.67 111.895C1259.57 111.895 1240.13 118.429 1225.3 131.496C1210.47 144.552 1202.53 162.963 1201.52 186.717H1227.38C1230.67 152.683 1250.06 135.661 1285.56 135.661C1304.57 135.661 1318.89 140.354 1328.53 149.719C1338.16 159.096 1342.99 171.689 1342.99 187.522C1342.99 193.846 1337.34 197.878 1326.06 199.597C1314.77 201.316 1297.47 202.44 1274.16 202.958C1251.34 203.486 1233.09 208.301 1219.39 217.413C1205.69 226.525 1198.86 240.44 1198.86 259.181C1198.86 277.923 1205.25 292.819 1218.06 303.914C1230.86 314.998 1247.41 320.529 1267.68 320.529C1285.42 320.529 1303.47 317.058 1317.31 308.85C1331.5 300.421 1341.56 285.999 1343.36 277.394V292.092C1343.36 305.61 1354.34 316.584 1367.86 316.584H1385.96V290.075H1378.36L1378.37 290.009ZM1343 244.098C1343 254.389 1339.52 263.5 1332.54 271.411C1325.56 279.322 1316.51 285.404 1305.35 289.613C1294.19 293.843 1282.79 296.091 1271.13 296.344C1256.93 296.344 1245.52 293.182 1236.91 286.836C1228.29 280.512 1223.98 271.4 1223.98 259.523C1223.98 239.999 1238.19 228.915 1266.57 226.271L1309.91 223.109L1338.76 220.498C1341 220.2 1343 221.963 1343 224.233V244.098Z" fill="#F5F5F5"/>
+  <path d="M81.08 69.94C51.23 100.14 32.8 141.64 32.8 187.47C32.8 233.29 51.23 274.79 81.08 304.99C33.69 287 0 241.17 0 187.47C0 133.77 33.69 87.93 81.08 69.94Z" fill="#F5F5F5"/>
+  <path d="M361.49 148.01C350.99 106.87 324.9 69.7 285.62 46.1C246.35 22.5 201.26 16.92 160.03 26.95C199.84 -4.42 256.49 -9.7 302.52 17.97C348.55 45.62 370.49 98.1 361.49 148.01Z" fill="#F5F5F5"/>
+  <path d="M361.49 231.13C350.99 272.27 324.9 309.45 285.62 333.05C246.35 356.65 201.26 362.22 160.03 352.2C199.84 383.56 256.49 388.84 302.52 361.18C348.55 333.52 370.49 281.04 361.49 231.13Z" fill="#F5F5F5"/>
+</svg>
+
+<div class="screens" id="screens">
+
+  <!-- TELA 1 — COVER -->
+  <div class="screen dark active" data-screen="1">
+    <div class="wn" style="text-align:left">
+      <div class="cover-logos">
+        <!-- Musa logo completo branco -->
+        <svg viewBox="0 0 1386 380" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:22px;width:auto">
+          <path d="M619.536 222.823L538.313 58.6137H490.43V316.574H516.289V72.4741L593.094 231.131H646.067L722.773 72.4741V316.574H748.632V58.6137H700.749L619.525 222.823H619.536Z" fill="#F5F5F5"/>
+          <path d="M941.869 215.651C941.869 239.395 935.589 258.4 923.04 272.646C910.491 286.903 893.556 294.01 872.281 294.01C855.787 294.01 843.117 288.732 834.247 278.177C825.367 267.622 820.938 252.451 820.938 232.663V115.896H795.839V237.411C795.839 262.488 801.668 282.607 813.336 297.778C824.992 312.95 842.863 320.541 866.959 320.541C886.736 320.541 907.968 314.492 921.211 303.485C934.454 292.478 937.914 286.683 941.869 277.439V316.574H967.343V115.907H941.869V215.651Z" fill="#F5F5F5"/>
+          <path d="M1149.23 222.514C1137.7 214.989 1123.05 209.656 1105.31 206.483L1077.94 201.338C1062.22 198.44 1051.25 194.672 1045.05 190.067C1038.83 185.45 1035.73 178.531 1035.73 169.287C1035.73 158.732 1040.03 150.557 1048.65 144.739C1057.27 138.944 1068.67 136.035 1082.87 136.035C1100.1 136.035 1113.54 140.002 1123.19 147.913C1132.8 155.823 1137.88 166.643 1138.4 180.371H1164.63C1163.62 159.008 1156.21 142.238 1142.39 130.097C1128.57 117.955 1109.24 111.895 1084.39 111.895C1062.33 111.895 1044.46 116.842 1030.77 126.736C1017.07 136.63 1010.24 150.953 1010.24 169.684C1010.24 187.367 1015.31 200.027 1025.46 207.684C1035.59 215.342 1050.17 221.005 1069.19 224.707L1098.85 230.249C1114.82 233.411 1125.85 237.377 1131.92 242.126C1138.02 246.875 1141.05 253.871 1141.05 263.104C1141.05 273.923 1136.74 282.176 1128.12 287.85C1119.51 293.524 1107.72 296.355 1092.75 296.355C1075.26 296.355 1060.93 292.345 1049.77 284.28C1038.61 276.237 1032.92 265.351 1032.66 251.623H1006.8C1007.31 272.733 1015.23 289.491 1030.58 301.897C1045.91 314.304 1066.13 320.496 1091.23 320.496C1113.8 320.496 1131.99 315.548 1145.8 305.654C1159.62 295.761 1166.54 281.437 1166.54 262.707C1166.54 243.977 1160.77 230.05 1149.24 222.525L1149.23 222.514Z" fill="#F5F5F5"/>
+          <path d="M1378.37 290.009C1374.56 290.009 1371.59 289.414 1370.06 287.563C1368.55 285.712 1368.09 282.098 1368.09 277.35V189.879C1368.09 137.886 1339.95 111.895 1283.67 111.895C1259.57 111.895 1240.13 118.429 1225.3 131.496C1210.47 144.552 1202.53 162.963 1201.52 186.717H1227.38C1230.67 152.683 1250.06 135.661 1285.56 135.661C1304.57 135.661 1318.89 140.354 1328.53 149.719C1338.16 159.096 1342.99 171.689 1342.99 187.522C1342.99 193.846 1337.34 197.878 1326.06 199.597C1314.77 201.316 1297.47 202.44 1274.16 202.958C1251.34 203.486 1233.09 208.301 1219.39 217.413C1205.69 226.525 1198.86 240.44 1198.86 259.181C1198.86 277.923 1205.25 292.819 1218.06 303.914C1230.86 314.998 1247.41 320.529 1267.68 320.529C1285.42 320.529 1303.47 317.058 1317.31 308.85C1331.5 300.421 1341.56 285.999 1343.36 277.394V292.092C1343.36 305.61 1354.34 316.584 1367.86 316.584H1385.96V290.075H1378.36L1378.37 290.009ZM1343 244.098C1343 254.389 1339.52 263.5 1332.54 271.411C1325.56 279.322 1316.51 285.404 1305.35 289.613C1294.19 293.843 1282.79 296.091 1271.13 296.344C1256.93 296.344 1245.52 293.182 1236.91 286.836C1228.29 280.512 1223.98 271.4 1223.98 259.523C1223.98 239.999 1238.19 228.915 1266.57 226.271L1309.91 223.109L1338.76 220.498C1341 220.2 1343 221.963 1343 224.233V244.098Z" fill="#F5F5F5"/>
+          <path d="M81.08 69.94C51.23 100.14 32.8 141.64 32.8 187.47C32.8 233.29 51.23 274.79 81.08 304.99C33.69 287 0 241.17 0 187.47C0 133.77 33.69 87.93 81.08 69.94Z" fill="#F5F5F5"/>
+          <path d="M361.49 148.01C350.99 106.87 324.9 69.7 285.62 46.1C246.35 22.5 201.26 16.92 160.03 26.95C199.84 -4.42 256.49 -9.7 302.52 17.97C348.55 45.62 370.49 98.1 361.49 148.01Z" fill="#F5F5F5"/>
+          <path d="M361.49 231.13C350.99 272.27 324.9 309.45 285.62 333.05C246.35 356.65 201.26 362.22 160.03 352.2C199.84 383.56 256.49 388.84 302.52 361.18C348.55 333.52 370.49 281.04 361.49 231.13Z" fill="#F5F5F5"/>
+        </svg>
+        <div class="logo-divider"></div>
+        <!-- Zamp logo novo -->
+        <svg width="654" height="191" style="height:20px;width:auto;filter:brightness(0) invert(1)" viewBox="0 0 654 191" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g filter="url(#filter0_d_2014_37)">
+<rect x="4" width="646" height="183" fill="url(#pattern0_2014_37)" shape-rendering="crispEdges"/>
+</g>
+<defs>
+<filter id="filter0_d_2014_37" x="0" y="0" width="654" height="191" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="4"/>
+<feGaussianBlur stdDeviation="2"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2014_37"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2014_37" result="shape"/>
+</filter>
+<pattern id="pattern0_2014_37" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_2014_37" transform="scale(0.00154799 0.00546448)"/>
+</pattern>
+<image id="image0_2014_37" width="646" height="183" preserveAspectRatio="none" xlink:href="data:image/png;base64,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"/>
+</defs>
+</svg>
+      </div>
+      <span class="tag">Relatório Anual · 2025–2026</span>
+      <h1 class="h1">Construímos juntos algo<br>que vai além da coleta.<br><em style="opacity:.55">Este relatório é a prova disso.</em></h1>
+      <p class="body">Um ano de operação. Três marcas. 804 lojas. Uma parceria que transformou conformidade em vantagem competitiva.</p>
+    </div>
+  </div>
+
+  <!-- TELA 2 — MARCAS -->
+  <div class="screen dark" data-screen="2">
+    <div class="wn">
+      <p class="label">O escopo da operação</p>
+      <h2 class="h2">Três marcas.<br>804 lojas.<br>Uma operação.</h2>
+      <div class="marcas-grid">
+
+        <div class="marca-card">
+          <div class="marca-logo">
+            <svg width="262" height="289" style="height:44px;width:auto" viewBox="0 0 262 289" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M242.238 272.775C220.378 285.113 182.874 288.641 130.999 288.641C79.1235 288.641 41.6194 285.113 19.7628 272.775C6.63874 265.386 0 255.313 0 248.089C0 243.979 2.18779 241.624 7.05888 241.624H254.934C259.808 241.624 261.996 243.978 261.996 248.089C261.999 255.313 255.357 265.385 242.24 272.775H242.238ZM254.935 81.3519H7.05941C2.18459 81.3519 0.000534227 78.8343 0.000534227 74.3026C0.000534227 47.4333 40.4423 0 130.999 0C220.718 0 262 47.4333 262 74.3026C262 78.8343 259.813 81.3519 254.935 81.3519Z" fill="white"/>
+<path d="M52.7994 192.177C52.0425 191.003 51.9623 190.246 51.9623 189.913C51.9623 188.989 52.4658 188.319 53.4728 187.395C55.8274 185.208 61.6323 179.753 64.8261 174.8C67.2635 171.023 68.2705 167.581 68.2705 164.73C68.2705 157.425 61.6318 151.712 54.396 151.712C49.7713 151.712 45.4 154.316 42.4591 159.101C38.5073 165.48 33.7966 172.87 30.7728 175.811C30.0154 176.568 29.5958 176.735 29.0089 176.735C27.9981 176.735 27.5785 176.061 27.5785 174.971V166.578C27.5785 158.351 22.7037 151.715 13.874 151.715C4.96137 151.715 0.16619 158.348 0.16619 166.578V218.296C0.16619 226.522 4.95763 233.161 13.874 233.161C22.7037 233.161 27.5785 226.529 27.5785 218.296V206.378C27.5785 205.368 27.9981 204.614 29.0089 204.614C30.3559 204.614 30.6921 205.959 31.0294 206.629C32.9628 211.248 38.5913 221.068 43.8093 226.863C47.3398 230.725 51.7116 233.162 56.3368 233.162C64.1558 233.162 70.7176 226.36 70.7176 219.054C70.7176 214.522 68.7804 211.163 65.0826 207.136C60.3719 202.004 54.8198 195.286 52.7994 192.181V192.177ZM157.656 146.925C170.856 146.925 179.182 138.528 179.182 126.271C179.182 118.465 174.467 113.089 165.055 113.089H162.367C157.402 113.089 153.535 115.443 153.535 120.732C153.535 125.434 157.656 127.701 160.767 127.701C162.364 127.701 163.377 128.205 163.377 129.382C163.377 130.889 161.613 131.899 159.592 131.899C153.284 131.899 148.996 127.447 148.996 119.135C148.996 109.902 154.885 106.547 159.423 106.547C164.972 106.547 165.898 109.401 169.766 109.401C174.224 109.401 177.252 105.707 177.252 101.845C177.252 98.9909 175.988 96.8101 174.055 95.2963C170.524 92.6921 165.565 90.7646 158.166 90.7646C145.129 90.7646 132.435 99.3277 132.435 119.141C132.429 138.108 145.127 146.925 157.656 146.925ZM9.83353 146.421H21.6935C32.8767 146.421 39.6854 138.949 39.6854 129.629C39.6854 122.156 35.2275 118.715 34.2205 117.874C33.8036 117.538 33.3834 117.204 33.3834 116.867C33.3834 116.451 33.6336 116.281 34.0569 115.777C35.6509 113.93 37.2485 110.992 37.2485 106.707C37.2485 96.6369 30.4366 91.2585 19.843 91.2585H9.83673C3.19478 91.2585 0.000488281 95.1263 0.000488281 100.328V137.351C0.000488281 142.56 3.19478 146.421 9.83353 146.421ZM14.7982 105.703C14.7982 104.613 15.4722 103.77 16.8988 103.77H17.9925C21.6069 103.77 22.7037 106.287 22.7037 108.474C22.7037 110.488 21.6128 113.343 17.9925 113.343H16.902C15.4717 113.343 14.7976 112.506 14.7976 111.412L14.7982 105.703ZM14.7982 125.35C14.7982 124.26 15.4722 123.416 16.8988 123.416H18.4131C22.4509 123.416 23.6247 126.101 23.6247 128.538C23.6247 130.725 22.4477 133.83 18.4131 133.83H16.9026C15.4722 133.83 14.7982 132.99 14.7982 131.896V125.35ZM229.378 146.838C234.758 146.838 237.7 142.807 237.7 137.771V128.872C237.7 127.781 238.206 127.278 239.047 127.278C240.054 127.278 240.388 127.865 240.554 128.872C241.314 133.153 243.331 138.945 245.599 141.886C248.46 145.667 251.147 146.845 253.841 146.845C258.209 146.845 261.997 143.4 261.997 139.115C261.997 136.261 260.82 134.16 259.306 132.233C256.445 128.625 254.682 126.275 253.592 123.336C253.338 122.663 253.505 122.073 254.265 121.488C256.873 119.474 259.9 115.023 259.9 107.974C259.9 97.3099 251.069 91.2644 240.388 91.2644H230.891C224.248 91.2644 221.055 95.1226 221.055 100.331V137.777C221.055 142.813 223.996 146.837 229.381 146.837L229.378 146.838ZM236.776 107.134C236.776 106.043 237.449 105.197 238.877 105.197H240.054C243.588 105.197 244.678 107.718 244.678 109.902C244.678 112.002 243.588 114.77 240.054 114.77H238.877C237.446 114.77 236.776 113.936 236.776 112.839V107.131V107.134ZM91.1437 151.71C81.7276 151.71 76.5957 158.759 76.5957 167.575V217.282C76.5957 226.102 81.7276 233.151 91.1437 233.151C100.559 233.151 105.688 226.099 105.688 217.282V167.575C105.688 158.765 100.563 151.71 91.1437 151.71ZM240.641 184.034H236.522C229.124 184.034 223.405 187.475 223.405 195.028C223.405 201.914 229.628 205.188 234.251 205.188C236.522 205.188 238.119 205.862 238.119 207.623C238.119 209.803 235.428 211.231 232.571 211.231C223.068 211.231 216.593 204.765 216.593 192.758C216.593 179.41 225.423 174.541 232.231 174.541C240.557 174.541 241.9 178.742 247.702 178.742C254.426 178.742 258.968 173.283 258.968 167.742C258.968 163.63 257.118 160.438 254.176 158.255C249.045 154.474 241.313 151.702 230.379 151.702C210.79 151.702 191.701 164.043 191.701 192.758C191.701 220.21 210.784 233.058 229.622 233.058C249.378 233.058 261.908 220.885 261.908 203.084C261.913 191.84 254.855 184.034 240.641 184.034ZM208.858 146.421C213.572 146.421 217.27 143.65 217.27 138.612C217.27 133.657 213.569 130.886 208.861 130.886H201.293C199.866 130.886 199.192 130.049 199.192 128.956V127.358C199.192 126.268 199.866 125.428 201.296 125.428H207.098C211.136 125.428 214.33 122.994 214.33 118.709C214.33 114.431 211.136 111.993 207.098 111.993H201.294C199.866 111.993 199.193 111.153 199.193 110.059V108.715C199.193 107.625 199.866 106.785 201.297 106.785H208.862C213.571 106.785 217.271 104.014 217.271 98.9786C217.271 94.0204 213.57 91.2495 208.862 91.2495H192.971C186.333 91.2495 183.135 95.1108 183.135 100.319V137.343C183.135 142.547 186.33 146.412 192.971 146.412H208.862V146.422H208.859M64.4059 146.838C78.0266 146.838 85.2586 138.692 85.2586 128.455V100.158C85.2586 95.1231 82.3177 91.0886 76.9335 91.0886C71.5519 91.0886 68.611 95.1231 68.611 100.158V127.528C68.611 129.539 67.434 131.89 64.4065 131.89C61.3789 131.89 60.3655 129.539 60.3655 127.528V100.158C60.3655 95.1231 57.3412 91.0886 51.9569 91.0886C46.5759 91.0886 43.6345 95.1231 43.6345 100.158V128.452C43.6382 138.696 50.7869 146.835 64.407 146.835L64.4059 146.838ZM123.433 146.838C127.805 146.838 131.592 143.397 131.592 139.112C131.592 136.258 130.415 134.157 128.902 132.23C126.464 129.038 124.277 126.267 123.187 123.333C122.933 122.659 123.101 122.069 123.861 121.482C126.468 119.472 129.496 115.02 129.496 107.968C129.496 97.304 120.663 91.2585 109.983 91.2585H100.478C93.8388 91.2585 90.6413 95.1199 90.6413 100.328V137.775C90.6413 142.81 93.5859 146.845 98.967 146.845C104.349 146.845 107.293 142.81 107.293 137.775V128.878C107.293 127.788 107.796 127.281 108.636 127.281C109.647 127.281 109.98 127.868 110.147 128.878C110.904 133.156 112.921 138.948 115.192 141.893C118.051 145.664 120.739 146.838 123.433 146.838ZM109.642 114.767H108.462C107.032 114.767 106.362 113.93 106.362 112.836V107.131C106.362 106.04 107.035 105.197 108.462 105.197H109.639C113.173 105.197 114.264 107.718 114.264 109.902C114.264 111.996 113.173 114.767 109.639 114.767H109.642ZM171.777 151.71C163.119 151.71 158.41 158.172 158.41 166.318V184.451C158.41 185.958 157.903 186.635 156.98 186.635C156.306 186.635 155.803 186.218 155.216 185.041L143.529 162.376C139.071 153.727 134.446 151.713 129.151 151.713C120.322 151.713 115.444 158.342 115.444 166.659V218.547C115.444 226.692 120.152 233.156 128.811 233.156C137.474 233.156 142.179 226.689 142.179 218.547V200.413C142.179 198.906 142.685 198.226 143.61 198.226C144.283 198.226 144.79 198.646 145.373 199.823L157.06 222.491C161.518 231.14 166.31 233.154 171.44 233.154C180.27 233.154 185.148 226.522 185.148 218.209V166.321C185.148 158.175 180.439 151.713 171.777 151.713V151.71Z" fill="white"/>
+</svg>
+          </div>
+          <div class="marca-count">
+            <span class="marca-count-num">702</span>
+            <span class="marca-count-label">unidades</span>
+          </div>
+        </div>
+
+        <div class="marca-card">
+          <div class="marca-logo">
+            <svg width="295" height="296" style="height:40px;width:auto" viewBox="0 0 295 296" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M130.667 0.681666C98 4.14833 64.2667 20.9483 41.0667 45.7483C25.8667 61.8817 15.4667 79.615 8 101.748C4.93333 111.082 0 134.148 0 139.748C0 140.282 2.13333 141.748 4.8 142.815C10.8 145.348 14.6667 144.548 28.5333 137.882C40.4 132.148 49.3333 130.948 49.3333 135.082C49.3333 138.815 45.4667 143.348 42.1333 143.348C40.4 143.348 33.8667 145.748 27.4667 148.815C18.4 153.082 14.2667 154.148 8.66667 154.148H1.33333V160.148V166.015H6.8C10.2667 166.015 16.2667 164.282 22.5333 161.482C28.1333 158.948 34.6667 156.548 37.0667 156.015C40.9333 155.215 41.3333 155.348 41.3333 158.415C41.3333 163.348 40 166.015 37.4667 166.015C36.2667 166.015 29.6 168.682 22.6667 172.015C15.7333 175.348 8.66667 178.015 6.93333 178.015C4.13333 178.015 3.86667 178.415 4.66667 182.282C5.2 184.682 6 187.215 6.26667 187.748C7.33333 189.482 14.6667 187.348 23.7333 182.548C28.4 180.015 33.7333 178.015 35.4667 178.015C38.4 178.015 38.8 178.548 38.4 182.282C38.1333 185.615 37.2 186.815 34 187.882C31.7333 188.682 26.5333 191.348 22.5333 193.615C18.4 196.015 13.7333 198.015 12.1333 198.015C9.73333 198.015 9.46667 198.548 10.1333 201.615C11.8667 209.348 13.4667 209.482 24.9333 203.215C36.5333 196.948 40 196.948 40 202.948C39.8667 206.282 38.6667 207.215 29.3333 211.882C20 216.415 18.8 217.482 19.4667 219.882C21.3333 226.015 23.0667 226.282 30.8 222.015C34.6667 219.882 39.0667 218.015 40.2667 218.015C42.1333 218.015 42.4 217.082 41.7333 213.348C40.9333 208.815 41.0667 208.682 45.7333 208.682C48.8 208.682 52.4 207.215 56.6667 204.415C61.6 200.948 63.3333 198.682 65.2 193.215C66.4 189.482 70.5333 180.948 74.4 174.282C82.1333 160.815 82.9333 156.015 79.3333 141.348C76.2667 128.548 76.8 117.348 80.8 108.682C84.6667 100.415 87.6 96.6817 90.2667 96.6817C91.7333 96.6817 91.6 97.4817 89.6 100.015C83.2 108.148 82.5333 128.415 88 144.015C91.8667 155.082 90.8 160.682 82.5333 173.348C70.6667 191.615 69.3333 199.082 75.6 213.082L79.2 221.082L74.6667 224.948C67.4667 231.082 57.0667 236.682 52.9333 236.682C49.8667 236.682 48.8 235.748 47.2 232.015C44.9333 226.548 43.0667 226.282 35.2 230.282C28.5333 233.482 28.1333 234.682 32 238.682L34.8 241.615L40.1333 238.948C44.4 236.815 46.1333 236.548 48.8 237.748C53.3333 239.882 53.0667 244.415 48.4 245.482C40.1333 247.215 39.4667 248.282 44.2667 252.682C47.6 255.748 49.6 256.015 53.4667 253.882C55.6 252.815 56.8 252.948 58.8 254.815C61.8667 257.615 62 260.148 59.2 261.748C56.4 263.348 57.4667 265.215 64.4 270.148L69.8667 274.015L74.4 265.748C84.4 247.882 86.6667 242.815 86.6667 239.215C86.6667 235.082 88.5333 233.082 90.1333 235.615C90.6667 236.415 91.0667 239.748 91.0667 242.815C91.0667 247.482 89.8667 250.548 84.2667 258.948C80.5333 264.682 77.0667 271.348 76.5333 273.615C75.8667 277.348 76.1333 278.015 79.7333 279.882L83.7333 281.882L84.5333 276.948C84.9333 274.282 88.2667 267.215 92 261.348C103.467 243.215 103.467 238.282 92.2667 223.082C88.9333 218.415 84.8 212.282 83.0667 209.348C77.3333 199.215 79.7333 188.815 91.4667 173.882C99.8667 163.215 100.4 157.882 94.6667 140.682C89.6 125.482 89.3333 117.482 93.3333 106.815C96.1333 99.4817 104.133 88.6817 106.8 88.6817C107.467 88.6817 106.533 90.9483 104.8 93.615C99.8667 101.082 97.2 109.615 97.0667 118.682C96.9333 125.082 98 129.082 102 138.682C109.467 156.815 108.8 161.615 96 179.348C92.9333 183.615 90.1333 189.615 89.2 193.615C87.0667 202.682 89.3333 208.682 99.3333 221.082C112.133 236.948 112 243.748 98.1333 266.548C92 276.815 91.3333 285.348 96.8 287.348C102.133 289.482 102.667 289.082 102.667 282.282C102.667 275.482 105.2 269.082 111.733 258.815C117.2 250.148 119.6 240.015 117.467 233.615C116.533 230.948 112.267 224.282 107.867 218.548C94.6667 201.482 94.5333 195.082 107.467 176.282C114 166.682 114.667 164.948 114.667 158.548C114.667 153.348 113.333 148.148 109.867 139.615C101.2 118.548 102.533 102.148 113.6 91.0817C118.667 86.015 122.667 84.815 118.4 89.615C114.933 93.4817 111.067 102.282 110 108.282C108.933 115.215 111.733 126.548 118.133 141.082C125.867 158.282 125.333 161.882 112 182.948C106.8 191.348 105.467 199.748 108.533 205.748C109.733 208.015 113.6 213.748 117.2 218.548C128.933 234.015 129.2 241.348 119.067 260.948C114 270.682 112.667 274.682 112.267 281.348C111.6 290.548 113.6 294.015 119.467 294.015C122.4 294.015 122.667 293.615 121.733 290.282C119.333 281.882 120.8 274.682 127.733 259.882C131.467 251.882 134.933 243.482 135.467 241.082C136.667 234.815 133.867 227.748 125.867 217.215C113.333 200.682 112.533 195.882 120.4 183.882C122.667 180.282 126.133 174.282 128 170.682C131.333 164.548 131.867 164.015 136.133 164.415C146.267 165.082 151.6 165.082 156.933 164.015C162.4 163.082 162.667 163.215 164.933 167.348C166.267 169.615 169.2 174.148 171.467 177.082C181.333 190.415 182.533 199.748 175.467 209.615C173.6 212.415 169.333 218.415 166 223.082C157.733 234.682 157.867 238.682 167.067 257.482C173.733 271.348 174 272.415 174 282.948V293.882L177.333 293.082C182.8 291.882 184.267 288.815 183.733 280.282C183.2 274.148 181.733 269.748 176.267 259.348C165.6 239.082 166 236.815 183.733 211.215C192.133 199.082 191.333 192.815 179.2 175.215C169.733 161.482 169.867 159.482 180.533 134.015C188 116.148 187.067 102.282 177.2 88.415C174.267 84.415 174.267 84.415 177.067 85.8817C181.467 88.1483 187.733 96.6817 190 103.215C193.2 112.548 192.4 119.615 186.533 137.082C183.6 146.015 181.067 155.882 181.067 159.082C181.067 164.948 181.867 166.548 191.6 180.682C201.333 194.948 200.8 201.748 188.533 218.015C174.933 235.882 174.533 240.948 185.333 259.748C192.4 272.015 195.333 280.682 194.133 285.348C193.333 288.282 193.6 288.415 198 286.948C202.4 285.615 202.667 285.215 202.667 280.148C202.667 276.548 201.2 272.282 198.4 267.348C187.733 248.682 186.4 245.482 187.333 240.282C188.267 233.615 191.467 227.482 199.467 216.682C202.933 211.882 206.267 205.882 206.667 203.215C208 195.882 205.2 187.215 197.467 175.615C193.733 169.748 190 162.815 189.2 160.148C187.867 155.348 188.4 153.215 196.933 130.682C200.8 120.415 196.933 98.9483 189.733 91.0817C188.267 89.3483 188.133 88.6817 189.333 88.6817C192.267 88.6817 199.6 98.015 202.533 105.615C206.267 115.482 206 123.082 201.333 139.482C199.2 147.082 197.333 154.815 197.333 156.682C197.333 161.082 201.2 169.348 206.933 177.482C213.733 186.948 216 191.882 216 197.348C216 204.148 213.467 209.348 204.267 221.748C199.867 227.748 195.867 234.282 195.333 236.415C194.267 241.482 196.667 248.148 205.067 262.682C208.933 269.215 212 275.882 212 277.615C212 281.082 214.267 281.615 218 278.815C220.4 277.082 220.4 276.815 218.267 271.215C217.067 268.015 213.6 261.748 210.667 257.348C206 250.415 205.333 248.415 205.333 241.748C205.333 237.615 206 233.748 206.667 233.348C207.467 232.948 208 233.615 208 234.948C208 239.748 210.8 246.948 215.467 254.682C218.133 259.082 221.6 265.215 223.2 268.282L226 273.748L232.4 269.215C239.333 264.148 240 262.682 236 261.348C232.667 260.282 232.533 257.748 235.733 254.815C237.867 253.082 238.933 252.948 242.533 254.148C246.267 255.482 247.2 255.348 250.133 252.548C251.867 250.948 253.333 249.082 253.333 248.548C253.333 248.015 250.933 246.682 248 245.482C242.133 243.215 241.733 242.415 244.533 238.682C246.4 236.148 246.533 236.148 254.133 238.548L261.867 240.948L264.267 238.015C265.6 236.415 266.667 234.548 266.667 234.015C266.667 233.482 263.2 231.482 259.067 229.615C251.467 226.148 248 226.548 248 230.548C248 231.482 247.2 233.215 246.267 234.548C244.8 236.682 243.867 236.682 239.067 235.482C232.8 233.748 217.333 222.682 217.333 220.015C217.333 218.948 218.8 215.348 220.667 211.882C226.8 200.415 225.067 191.882 212.667 172.815C204.8 160.815 204 155.482 207.867 142.682C213.067 124.815 212.667 115.348 206 100.148L203.733 94.815L206.933 96.815C212 100.148 217.333 112.415 218.267 122.948C218.8 130.415 218.4 134.282 216.133 141.748C211.733 156.548 212.533 160.415 223.867 177.882C226.933 182.682 230 188.948 230.933 191.882C231.733 194.948 233.067 198.148 233.867 199.215C237.067 203.348 245.867 208.682 249.733 208.682C253.467 208.682 253.6 208.948 253.067 213.348C252.667 216.948 253.067 218.015 254.667 218.015C255.733 218.015 260.267 219.748 264.667 221.882C271.867 225.482 272.667 225.615 274.267 223.615C275.2 222.282 275.867 220.415 276 219.348C276 217.082 260.4 207.348 256.933 207.348C254.533 207.348 254.267 205.882 255.467 201.082C256.533 197.215 259.867 197.882 271.867 204.282C281.067 209.082 283.467 208.682 284.267 202.548C284.533 200.148 282.533 198.548 273.067 193.482C266.667 190.148 260.533 187.348 259.467 187.348C256.667 187.348 255.6 185.082 256.533 181.215C257.733 176.815 260.4 177.082 273.067 183.482C286.267 190.148 289.867 190.015 290.4 182.948C290.8 178.548 290.533 178.015 287.6 178.015C285.867 178.015 279.2 175.348 272.8 172.015C266.267 168.682 259.6 166.015 257.867 166.015C256.133 166.015 254.667 165.215 254.667 164.282C254.667 163.482 254.267 161.348 253.867 159.615C253.067 156.948 253.467 156.682 257.6 156.682C260.267 156.682 266.933 158.815 272.533 161.482C280.267 164.948 284.267 166.015 288.4 165.748C294 165.348 294 165.348 294.4 159.748L294.8 154.282H287.6C281.867 154.415 277.867 153.215 268.4 148.815C261.867 145.882 254.8 143.348 252.8 143.348C250 143.348 248.8 142.415 247.333 139.082C246.4 136.682 245.867 134.282 246.133 133.748C247.733 131.215 256.267 133.215 268 138.682C281.2 144.948 285.6 145.748 291.333 143.082C295.333 141.348 295.467 139.482 292.667 122.148C287.733 91.8817 274.533 66.1483 252.667 44.1483C239.467 30.815 217.333 15.7483 202.133 9.88167C181.467 1.88167 154 -1.585 130.667 0.681666ZM152 17.3483L155.867 26.015H164.667C170.4 26.015 173.333 26.5483 173.333 27.615C173.333 28.415 170.4 31.8817 166.667 35.215L160.133 41.3483L163.467 49.615L166.933 58.015L172.533 54.5483C179.867 49.8817 189.067 45.7483 194.533 44.5483C198.8 43.615 198.933 43.7483 198.133 47.0817C197.733 49.0817 196.533 53.4817 195.467 56.9483C194.4 60.5483 193.867 63.3483 194.4 63.3483C194.933 63.3483 198.4 62.2817 202 60.815C211.333 57.3483 216 56.415 216 57.8817C216 58.6817 213.867 62.815 211.333 67.215C208.667 71.7483 205.867 78.415 204.933 82.015C203.733 87.0817 202.933 88.5483 201.333 87.8817C189.067 83.0817 170.4 77.8817 161.067 76.815C142.4 74.6817 120.8 77.8817 102.133 85.4817C97.7333 87.215 93.7333 88.6817 93.2 88.6817C92.6667 88.6817 91.7333 86.6817 91.3333 84.2817C90.2667 79.615 85.0667 68.6817 81.2 63.0817C79.7333 61.215 78.6667 59.215 78.6667 58.815C78.6667 57.0817 86.5333 58.2817 93.7333 61.215C100.933 64.2817 101.333 64.2817 101.333 61.8817C101.333 60.5483 100.133 56.2817 98.6667 52.415C97.2 48.5483 96 45.0817 96 44.815C96 42.815 107.6 46.9483 116.267 52.015C128.533 59.0817 129.467 58.9483 132.667 48.1483L134.8 41.3483L127.867 34.9483C124.133 31.4817 121.467 28.1483 121.867 27.615C122.4 27.215 126.533 26.5483 131.2 26.2817L139.467 25.7483L143.2 17.215C145.333 12.5483 147.2 8.68167 147.6 8.68167C147.867 8.68167 149.867 12.5483 152 17.3483ZM36.8 73.4817C41.7333 78.415 46.5333 87.4817 46.6667 91.615C46.6667 95.3483 49.0667 95.615 57.3333 92.815C66.9333 89.4817 78.4 89.0817 82.1333 92.015C84.6667 94.015 84.5333 94.1483 81.3333 96.2817C79.4667 97.4817 73.2 103.348 67.3333 109.348C56.9333 120.015 56.4 120.282 49.0667 121.082C44.8 121.482 36.9333 123.882 31.0667 126.415C18.4 132.148 13.7333 133.082 9.06667 130.948L5.6 129.348L14.1333 116.148C24.6667 99.7483 28.2667 90.815 28.8 78.6817C29.2 67.615 29.0667 68.6817 30.6667 68.6817C31.3333 68.6817 34.1333 70.815 36.8 73.4817ZM268 80.015C268 92.5483 270.533 99.4817 281.333 116.148C290.533 130.415 290.533 132.015 280.933 132.015C277.2 132.015 271.867 130.282 265.067 126.948C256.8 122.948 253.333 122.015 246.933 122.015C239.733 122.015 238.8 121.615 236.533 118.415C232.4 112.015 222.133 101.748 216.267 97.8817L210.533 94.2817L213.6 92.1483C218.133 88.9483 229.867 89.4817 239.333 93.3483C243.733 95.215 247.467 96.6817 247.6 96.6817C247.733 96.6817 248.8 93.3483 250 89.215C252.4 81.0817 261.2 70.015 265.467 70.015C267.733 70.015 268 71.0817 268 80.015ZM164.933 84.6817C170.267 87.0817 176 93.7483 176 97.615C176 98.815 173.733 99.3483 168.8 99.3483C158.267 99.3483 153.733 101.348 152 106.815C150.133 112.282 151.333 120.682 153.867 120.682C154.933 120.682 156 119.882 156.4 118.815C156.933 117.482 159.467 116.948 166.267 117.082L175.333 117.348L175.733 122.815C176.4 131.615 171.467 142.948 163.467 150.815C155.6 158.548 150.8 160.015 141.867 157.882C129.467 154.682 118.133 138.148 118.933 124.415L119.333 117.348H130.4C142.667 117.348 143.6 116.682 141.867 108.015C140.8 101.748 136.933 99.3483 128.4 99.3483C120.267 99.3483 118.933 97.8817 122.133 92.9483C127.467 84.6817 133.6 82.1483 148 82.1483C156.4 82.015 160.8 82.6817 164.933 84.6817ZM134 107.348C137.2 110.815 136.267 111.615 130.8 110.015C127.867 109.215 125.467 109.215 123.867 110.015C120.4 111.882 120 111.748 120 108.015C120 104.948 120.533 104.682 125.733 104.682C129.867 104.682 132.267 105.482 134 107.348ZM174.4 106.282C177.6 109.482 176.267 111.615 171.733 110.548C169.333 110.015 165.333 109.615 163.067 109.748C160.667 109.882 158.667 109.348 158.667 108.682C158.667 105.348 171.467 103.348 174.4 106.282Z" fill="white"/>
+<path d="M140.133 56.8155C136.4 59.7488 133.6 62.6821 133.867 63.0821C134.133 63.6155 140.533 63.8821 148 63.6155C163.067 63.0821 163.333 62.6821 152.533 55.2155L146.933 51.3488L140.133 56.8155Z" fill="white"/>
+<path d="M140.533 128.948C139.6 130.415 146.267 131.748 150.133 130.815C152.133 130.282 153.2 129.482 152.8 128.948C151.467 127.748 141.333 127.615 140.533 128.948Z" fill="white"/>
+<path d="M136 138.682C136 139.882 140.933 144.416 144 146.016C145.467 146.816 148.133 147.082 149.733 146.549C152.933 145.616 158.667 140.816 158.667 139.082C158.667 138.549 153.6 138.016 147.333 138.016C141.067 138.016 136 138.282 136 138.682Z" fill="white"/>
+<path d="M250.667 279.349C250.667 280.016 251.867 280.682 253.333 280.682C255.733 280.682 256 281.616 256 288.016C256 292.016 256.667 295.349 257.333 295.349C258.133 295.349 258.667 292.016 258.667 288.016C258.667 281.616 258.933 280.682 261.333 280.682C262.8 280.682 264 280.016 264 279.349C264 278.549 261.067 278.016 257.333 278.016C253.733 278.016 250.667 278.549 250.667 279.349Z" fill="white"/>
+<path d="M266.667 286.682C266.667 291.615 267.2 295.349 268 295.349C268.8 295.349 269.333 292.149 269.467 288.282L269.6 281.349L271.333 287.749C274.133 298.015 275.2 298.015 278 287.749L279.733 281.349L279.867 288.282C280 292.149 280.667 295.349 281.333 295.349C282.133 295.349 282.667 291.615 282.667 286.682C282.667 279.082 282.4 278.015 280.133 278.015C278.133 278.015 277.333 279.349 276.667 283.349C276.133 286.282 275.333 288.682 274.667 288.682C274 288.682 273.2 286.282 272.667 283.349C272 279.349 271.2 278.015 269.2 278.015C266.933 278.015 266.667 279.082 266.667 286.682Z" fill="white"/>
+</svg>
+          </div>
+          <div class="marca-count">
+            <span class="marca-count-num">10</span>
+            <span class="marca-count-label">unidades</span>
+          </div>
+        </div>
+
+        <div class="marca-card">
+          <div class="marca-logo">
+            <svg width="1895" height="300" style="height:22px;width:auto" viewBox="0 0 1895 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M1007.53 73.919C1036.04 73.919 1057.66 90.6335 1059.63 121.109L951.499 121.119V121.109C958.382 92.5931 977.057 73.919 1007.53 73.919ZM1532.43 73.919C1561.92 73.919 1582.56 90.6335 1585.5 121.109L1477.38 121.119V121.109C1484.27 92.5931 1501.96 73.919 1532.43 73.919ZM114.024 73.919C171.035 76.8677 184.796 100.465 184.796 120.123C184.796 148.629 166.119 170.251 114.024 171.236V73.919ZM693.968 75.8809C749.995 78.8377 763.758 102.427 763.758 122.084C763.758 149.609 745.083 171.236 693.968 172.22V75.8809ZM434.467 82.7685C473.783 82.7685 499.341 113.237 499.341 150.591C499.341 188.929 473.783 219.398 434.467 219.398C394.168 219.398 368.606 188.929 368.606 150.591C368.606 113.237 394.168 82.7685 434.467 82.7685ZM99.155 -2.19314e-06C65.6523 -2.19314e-06 20.3686 2.43379 0 4.12837L1.96647 74.9058L24.5748 73.919V296.072L114.024 296.088V240.042C244.759 234.139 275.228 165.335 275.228 117.169C275.228 48.3608 218.216 5.11515 114.024 0.195279C109.46 0.0616184 104.455 -2.19314e-06 99.155 -2.19314e-06ZM679.087 2.95566C645.791 2.95566 601.285 5.38363 580.928 7.07589L582.895 77.8521L605.503 75.8809V296.072L693.968 296.088V241.025C823.716 235.123 853.208 166.319 853.208 119.14C853.208 50.332 797.178 8.05801 693.968 3.15324C689.385 3.01609 684.378 2.95566 679.087 2.95566ZM1213.95 14.9386L1116.64 14.9549L1219.84 218.414V296.072L1313.23 296.088V218.414L1422.33 14.9386L1323.05 14.9549L1267.03 133.879L1213.95 14.9386ZM433.483 6.09724C350.916 6.09724 283.093 66.0574 283.093 151.576C283.093 237.097 350.916 297.054 433.483 297.054C516.052 297.054 583.877 237.097 583.877 151.576C583.877 66.0574 515.069 6.09724 433.483 6.09724ZM1789.96 3.15324C1727.04 3.15324 1677.9 32.6353 1677.9 92.5931C1677.9 138.796 1700.51 161.41 1744.75 181.067C1757.53 185.979 1774.23 190.891 1787.02 195.808C1797.83 200.727 1804.71 205.632 1804.71 214.486C1804.71 222.349 1797.83 229.234 1776.2 229.234C1756.54 229.234 1728.03 221.371 1707.4 208.589L1677.9 269.531C1706.41 290.176 1740.82 298.038 1776.2 298.038C1831.24 298.038 1890.23 274.444 1890.23 211.535C1890.23 164.357 1859.75 141.742 1827.31 128.965C1810.6 122.084 1791.92 115.209 1779.15 109.307C1767.35 104.388 1762.44 98.4963 1762.44 90.6335C1762.44 78.8377 1774.23 72.938 1788.98 72.938C1811.59 72.938 1829.28 83.7529 1845 100.465L1894.16 49.3464C1873.51 20.8406 1836.16 3.15324 1789.96 3.15324ZM1006.55 4.12837C921.03 4.12837 861.068 66.0574 861.068 151.576C861.068 236.112 917.096 300 1016.38 300C1060.61 300 1098.95 289.191 1130.4 265.604L1095.01 202.689C1072.4 218.414 1047.83 226.276 1019.32 227.261C982.957 227.261 960.345 209.574 952.483 181.067H952.493L1142.2 181.076C1144.16 167.301 1145.14 154.523 1145.14 140.767C1145.14 80.7996 1112.71 4.12837 1006.55 4.12837ZM1532.43 4.12837C1445.93 4.12837 1385.97 66.0574 1385.97 151.576C1385.97 236.112 1443.96 300 1541.28 300C1581.58 300 1615.98 291.153 1645.47 271.493L1613.03 206.616C1592.38 220.387 1569.78 227.261 1544.22 227.261C1508.84 227.261 1486.22 210.551 1478.37 181.067H1478.38L1668.07 181.076C1670.05 167.301 1671.02 154.523 1671.02 141.742C1670.05 80.7996 1637.61 4.12837 1532.43 4.12837Z" fill="white"/>
+</svg>
+          </div>
+          <div class="marca-count">
+            <span class="marca-count-num">92</span>
+            <span class="marca-count-label">unidades</span>
+          </div>
+        </div>
+
+      </div>
+      <div class="pills" style="margin-top:1.5rem">
+        <span class="pill">Resíduo Comum</span>
+        <span class="pill">Reciclável</span>
+        <span class="pill">Orgânicos</span>
+        <span class="pill">Óleo Vegetal</span>
+        <span class="pill">Papelão</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA 3 — COLETAS -->
+  <div class="screen light" data-screen="3">
+    <div class="wn">
+      <p class="label">Volume de coletas</p>
+      <h2 class="h2">Uma operação que não para.<br>54.248 coletas, em 12 meses.</h2>
+      <p class="body" style="color:var(--ml)">Com consistência, cobertura e um índice de sucesso que ninguém no mercado consegue sustentar nessa escala.</p>
+      <div class="kpi-row kpi-row-light" style="margin-top:2rem;gap:1rem">
+        <div class="kpi-block" style="background:white;border:1px solid rgba(0,0,0,.1)">
+          <span class="kpi-n" style="color:var(--td)" data-target="174">174</span>
+          <span class="kpi-l">Média de coletas / dia</span>
+          <span class="kpi-x">Ao longo dos 12 meses</span>
+        </div>
+        <div class="kpi-block" style="background:white;border:1px solid rgba(0,0,0,.1)">
+          <span class="kpi-n" style="color:#B8783A" data-target="92.5" data-dec="1" data-suf="%">92,5%</span>
+          <span class="kpi-l">Taxa de sucesso</span>
+          <span class="kpi-x">Coletas realizadas com êxito</span>
+        </div>
+        <div class="kpi-block" style="background:white;border:1px solid rgba(0,0,0,.1)">
+          <span class="kpi-n" style="color:var(--td)" data-target="67.47" data-dec="2">67,47</span>
+          <span class="kpi-l">Coletas por loja</span>
+          <span class="kpi-x">Média no período</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA 4 — PRESENÇA NACIONAL -->
+  <div class="screen dark" data-screen="4">
+    <div class="wn">
+      <p class="label">Presença nacional</p>
+      <h2 class="h2">20 estados.<br>189 municípios.<br>7.825 toneladas.</h2>
+      <p class="body">Uma operação que cobre o Brasil de ponta a ponta — com rastreabilidade comprovada em cada quilograma destinado.</p>
+      <div class="kpi-row" style="margin-top:2rem;gap:1rem">
+        <div class="kpi-block">
+          <span class="kpi-n" data-target="20">20</span>
+          <span class="kpi-l">Estados</span>
+          <span class="kpi-x">Cobertura nacional</span>
+        </div>
+        <div class="kpi-block">
+          <span class="kpi-n" data-target="189">189</span>
+          <span class="kpi-l">Municípios</span>
+          <span class="kpi-x">Capilaridade real</span>
+        </div>
+        <div class="kpi-block">
+          <span class="kpi-n" data-target="7825.8" data-dec="1" data-suf=" t">7.825,8 t</span>
+          <span class="kpi-l">Gerenciadas</span>
+          <span class="kpi-x">= 8.694.558 kg destinados</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA 5 — CONFORMIDADE -->
+  <div class="screen light" data-screen="5">
+    <div class="wn">
+      <p class="label">Conformidade e rastreabilidade</p>
+      <h2 class="h2">59 operadores.<br>Um único contrato.</h2>
+      <p class="body" style="color:var(--ml)">Dezenas de parceiros, centenas de documentos, 15 órgãos regulatórios. A Musa centralizou tudo — e manteve 100% da operação em conformidade.</p>
+      <div class="kpi-row kpi-row-light" style="margin-top:2rem;gap:1rem">
+        <div class="kpi-block" style="background:white;border:1px solid rgba(0,0,0,.1)">
+          <span class="kpi-n" style="color:var(--td)" data-target="590">590</span>
+          <span class="kpi-l">Documentações validadas</span>
+          <span class="kpi-x">Licenças, alvarás e certidões homologadas</span>
+        </div>
+        <div class="kpi-block" style="background:white;border:1px solid rgba(0,0,0,.1)">
+          <span class="kpi-n" style="color:var(--td)">+50 mil</span>
+          <span class="kpi-l">MTRs emitidos</span>
+          <span class="kpi-x">Ao longo dos 12 meses de operação</span>
+        </div>
+        <div class="kpi-block" style="background:white;border:1px solid rgba(0,0,0,.1)">
+          <span class="kpi-n" style="color:#B8783A" data-target="93.3" data-dec="1" data-suf="%">93,3%</span>
+          <span class="kpi-l">MTRs disponíveis</span>
+          <span class="kpi-x">Dos últimos 90 dias no portal</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA 6 — DESTAQUE < 1 MIN -->
+  <div class="screen dark" data-screen="6">
+    <div class="wn">
+      <p class="label">O número que muda tudo</p>
+      <div class="destaque-num">&lt;&nbsp;1 min</div>
+      <p class="body" style="max-width:440px">É o tempo para acessar qualquer MTR da operação. Documentação centralizada, indexada, disponível — na hora em que você precisar.</p>
+      <div class="destaque-vs">
+        <div class="destaque-vs-item">
+          <span class="destaque-vs-val orange">&lt; 1 min</span>
+          <span class="destaque-vs-label">Operação Zamp</span>
+        </div>
+        <div class="destaque-vs-divider"></div>
+        <div class="destaque-vs-item">
+          <span class="destaque-vs-val muted">3–7 dias</span>
+          <span class="destaque-vs-label">Média do mercado</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA 7 — FINANCEIRO -->
+  <div class="screen light" data-screen="7">
+    <div class="w">
+      <p class="label">Eficiência econômica</p>
+      <h2 class="h2">A operação que<br>também gera receita.</h2>
+      <div class="fin-grid">
+        <div class="fin-card">
+          <p class="fin-label">Redução de custo operacional</p>
+          <p class="fin-big">De R$ <strong>[X]</strong> mil<br>para R$ <strong>[X]</strong> mil / mês</p>
+          <p class="fin-sub">Redução estrutural no custo de coleta ao longo dos 12 meses.</p>
+          <span class="fin-tag">[X]% de redução mensal</span>
+        </div>
+        <div class="fin-card">
+          <p class="fin-label">Receita com óleo vegetal</p>
+          <p class="fin-big">R$ <strong>[X]</strong> mil / mês<br>em receita gerada</p>
+          <p class="fin-sub">[X] mil litros / mês comercializados. Um resíduo que virou fonte de receita recorrente.</p>
+          <span class="fin-tag">↑ R$ [X] mil mensais no período</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA 8 — AMBIENTAL -->
+  <div class="screen dark" data-screen="8">
+    <div class="wn">
+      <p class="label">Impacto ambiental</p>
+      <h2 class="h2">Números prontos<br>para o seu ESG.</h2>
+      <p class="body">Cada coleta rastreada é uma comprovação ambiental. Esses indicadores já estão disponíveis para seus relatórios de sustentabilidade.</p>
+      <div class="env-grid">
+        <div class="env-card">
+          <span class="env-icon">♻</span>
+          <span class="env-n">[X] mil kg</span>
+          <span class="env-l">Reciclados</span>
+          <span class="env-x">Material reciclável destinado corretamente</span>
+        </div>
+        <div class="env-card">
+          <span class="env-icon">🌿</span>
+          <span class="env-n">[X] t CO₂</span>
+          <span class="env-l">Não emitidos</span>
+          <span class="env-x">Carbono evitado pela destinação correta</span>
+        </div>
+        <div class="env-card">
+          <span class="env-icon">💧</span>
+          <span class="env-n">[X] mil L</span>
+          <span class="env-l">Água economizada</span>
+          <span class="env-x">Poupada pelo processo de reciclagem</span>
+        </div>
+        <div class="env-card">
+          <span class="env-icon">⚡</span>
+          <span class="env-n">[X] mil kWh</span>
+          <span class="env-l">Energia poupada</span>
+          <span class="env-x">Equivalente do reaproveitamento de materiais</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA 9 — PRÓXIMOS PASSOS -->
+  <div class="screen dark" data-screen="9">
+    <div class="wn">
+      <p class="label">O que vem a seguir</p>
+      <h2 class="h2">O próximo ano começa com tudo que construímos até aqui.</h2>
+      <div class="steps">
+        <div class="step">
+          <span class="step-n">01</span>
+          <div>
+            <p class="step-t">Inteligência de dados por loja</p>
+            <p class="step-d">Dashboards individuais com benchmarks de geração, coleta e custo — visibilidade real para cada gestor.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-n">02</span>
+          <div>
+            <p class="step-t">Expansão da valorização do óleo vegetal</p>
+            <p class="step-d">Elevar as bottom performers ao nível das top performers. A diferença já está mapeada.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-n">03</span>
+          <div>
+            <p class="step-t">Relatório ESG automatizado</p>
+            <p class="step-d">Entrega trimestral de indicadores prontos para sustentabilidade — sem esforço adicional da equipe Zamp.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA 10 — ENCERRAMENTO -->
+  <div class="screen dark" data-screen="10">
+    <div class="wn">
+      <p class="closing-quote">"Obrigado por um ano de confiança. Estamos prontos para o próximo."</p>
+      <p class="closing-name">— Equipe Musa · Conta Zamp</p>
+      <a href="#" class="btn-cta"><span>Conversar sobre a renovação →</span></a>
+    </div>
+  </div>
+
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nav-btn" id="btn-prev" onclick="go(-1)" disabled><span>← Anterior</span></button>
+  <div class="nav-dots" id="dots"></div>
+  <button class="nav-btn" id="btn-next" onclick="go(1)"><span>Próximo →</span></button>
+</div>
+
+<script>
+const TOTAL = 10;
+let current = 1;
+let animating = false;
+
+const screens = document.querySelectorAll('.screen');
+const pf = document.getElementById('pf');
+const pl = document.getElementById('pl');
+const dotsEl = document.getElementById('dots');
+const btnPrev = document.getElementById('btn-prev');
+const btnNext = document.getElementById('btn-next');
+const logoFixed = document.getElementById('logo-fixed');
+
+// Build dots
+for (let i = 1; i <= TOTAL; i++) {
+  const d = document.createElement('div');
+  d.className = 'nav-dot' + (i === 1 ? ' active' : '');
+  d.onclick = () => goTo(i);
+  dotsEl.appendChild(d);
+}
+
+function getScreen(n) {
+  return document.querySelector(`[data-screen="${n}"]`);
+}
+
+function updateUI() {
+  pf.style.width = (current / TOTAL * 100) + '%';
+  pl.textContent = current + ' / ' + TOTAL;
+  btnPrev.disabled = current === 1;
+  btnNext.disabled = current === TOTAL;
+
+  // Update dots
+  document.querySelectorAll('.nav-dot').forEach((d, i) => {
+    d.classList.toggle('active', i + 1 === current);
+  });
+
+  // Light screen = dark nav text + dark logo
+  const isLight = getScreen(current).classList.contains('light');
+  pl.className = 'progress-label' + (isLight ? ' dark-text' : '');
+
+  // Hide fixed logo on cover
+  const isFirst = current === 1;
+  logoFixed.style.opacity = isFirst ? '0' : '1';
+  logoFixed.style.pointerEvents = isFirst ? 'none' : 'all';
+  const logoPaths = logoFixed.querySelectorAll('path');
+  logoPaths.forEach(p => p.setAttribute('fill', isLight ? '#222222' : '#F5F5F5'));
+
+  // Nav buttons on light screens
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.style.borderColor = isLight ? 'rgba(0,0,0,.2)' : '';
+    b.style.color = isLight ? 'rgba(0,0,0,.6)' : '';
+  });
+  document.querySelectorAll('.nav-dot').forEach(d => {
+    d.style.background = d.classList.contains('active')
+      ? 'var(--orange)'
+      : isLight ? 'rgba(0,0,0,.2)' : 'rgba(255,255,255,.25)';
+  });
+}
+
+function animateCounters(screenEl) {
+  screenEl.querySelectorAll('[data-target]').forEach(el => {
+    const target = parseFloat(el.getAttribute('data-target'));
+    if (isNaN(target)) return;
+    const suf = el.getAttribute('data-suf') || '';
+    const dec = parseInt(el.getAttribute('data-dec') || '0');
+    const fmt = el.getAttribute('data-fmt') || '';
+    const dur = 1200, t0 = performance.now();
+    function tick(now) {
+      const p = Math.min((now - t0) / dur, 1);
+      const v = (1 - Math.pow(1 - p, 3)) * target;
+      let s = fmt === 'dot' ? Math.round(v).toLocaleString('pt-BR')
+            : dec > 0 ? v.toFixed(dec).replace('.', ',')
+            : Math.round(v).toLocaleString('pt-BR');
+      el.textContent = s + suf;
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
+function goTo(n) {
+  if (animating || n === current || n < 1 || n > TOTAL) return;
+  animating = true;
+  const dir = n > current ? 1 : -1;
+  const from = getScreen(current);
+  const to = getScreen(n);
+
+  from.classList.remove('active');
+  from.classList.add('exit-left');
+  to.style.transform = `translateX(${dir * 40}px)`;
+  to.style.opacity = '0';
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      to.classList.add('active');
+      to.style.transform = '';
+      to.style.opacity = '';
+      current = n;
+      updateUI();
+      animateCounters(to);
+      setTimeout(() => {
+        from.classList.remove('exit-left');
+        animating = false;
+      }, 550);
+    });
+  });
+}
+
+function go(dir) { goTo(current + dir); }
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(-1);
+});
+
+// Init
+updateUI();
+animateCounters(getScreen(1));
+</script>
+</body>
+</html>
