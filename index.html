@@ -298,6 +298,14 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--t
 .pills { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.5rem; }
 .pill { font-size: .68rem; padding: .3rem .8rem; border-radius: 100px; border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.45); }
 
+@media (max-width: 700px) {
+  .screen6-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+    padding: 0 !important;
+  }
+}
+
 /* RESPONSIVE */
 @media (max-width: 700px) {
   .fin-grid { grid-template-columns: 1fr; }
@@ -306,20 +314,19 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--t
   .destaque-num { font-size: clamp(4rem, 18vw, 7rem); }
 }
 @media (max-width: 500px) {
-  .screen { padding: 4rem 1.25rem 5.5rem; }
+  .screen { padding: 5.5rem 1.25rem 7rem; }
+  #brazilMap { max-height: 220px; }
+  .map-grid { grid-template-columns: 1fr !important; }
 }
 
-  @keyframes bubblePulse {
-    0%, 100% { transform: scale(1); opacity: 0.75; }
-    50% { transform: scale(1.08); opacity: 0.95; }
-  }
-  #brazilMap circle {
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-    #brazilMap { max-height: 300px; }
-    .map-grid { grid-template-columns: 1fr !important; }
-  }
+@keyframes bubblePulse {
+  0%, 100% { transform: scale(1); opacity: 0.75; }
+  50% { transform: scale(1.08); opacity: 0.95; }
+}
+#brazilMap circle {
+  transform-box: fill-box;
+  transform-origin: center;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
@@ -517,7 +524,7 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--t
 
   <!-- TELA 6 — MAPA BRASIL -->
   <div class="screen light" data-screen="6">
-    <div style="width:100%;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1.6fr;gap:3rem;align-items:center;padding:0 2rem">
+    <div style="width:100%;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1.6fr;gap:3rem;align-items:center;padding:0 2rem" class="screen6-grid">
       <div style="padding-left:clamp(0px, calc(158px + (100vw - 1440px) * 0.5), 200px);max-width:420px">
         <p class="label">Distribuição por estado</p>
         <h2 class="h2">Operações adaptadas a cada região.</h2>
@@ -713,7 +720,7 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--t
     <div class="wn">
       <p class="closing-quote">"Obrigado por um ano de confiança. Estamos prontos para o próximo."</p>
       <p class="closing-name">— Equipe Musa</p>
-      <a class="btn-cta" style="margin-top:3rem;cursor:default"><span>Lixo com futuro.</span></a>
+      <a class="btn-cta" style="margin-top:1.5rem;cursor:default"><span>Lixo com futuro.</span></a>
     </div>
   </div>
 
