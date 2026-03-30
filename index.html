@@ -953,6 +953,21 @@ function initChartColetas() {
 
 updateUI();
 animateCounters(getScreen(1));
+
+// Mobile: ajusta padding-bottom de cada screen baseado na altura real da nav
+function adjustMobilePadding() {
+  if (window.innerWidth > 700) return;
+  const nav = document.querySelector('.nav');
+  if (!nav) return;
+  const navH = nav.getBoundingClientRect().height;
+  const navBottom = parseFloat(getComputedStyle(nav).bottom) || 20;
+  const pad = navH + navBottom + 32; // altura da nav + offset do bottom + 32px folga visual
+  document.querySelectorAll('.screen').forEach(s => {
+    s.style.paddingBottom = pad + 'px';
+  });
+}
+adjustMobilePadding();
+window.addEventListener('resize', adjustMobilePadding);
 </script>
 </body>
 </html>
