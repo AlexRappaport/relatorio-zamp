@@ -689,13 +689,14 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--t
       <p class="label">Potencial do óleo vegetal</p>
       <h2 class="h2" style="max-width:600px;margin-bottom:.75rem">Um ano de dados.<br>Agora é escalar.</h2>
       <p class="body" style="margin-bottom:1.25rem">Com 12 meses de operação, mapeamos o padrão de cada loja. Sabemos quem performa, quem tem espaço para crescer — e quanto isso vale.</p>
+      <p style="font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:.75rem;font-weight:500">Fotografia · Fev/2026</p>
 
       <!-- 3 grupos -->
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;width:100%">
 
         <div class="kpi-block" style="border-color:rgba(255,186,134,.4);background:rgba(255,186,134,.06);padding:1rem 1.25rem">
           <span style="font-size:.55rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:.4rem">⬆ Top</span>
-          <span style="font-family:'Libre Caslon Text',serif;font-size:clamp(1.6rem,4vw,2rem);color:var(--orange);display:block;line-height:1;margin-bottom:.2rem">60</span>
+          <span style="font-family:'Libre Caslon Text',serif;font-size:clamp(1.6rem,4vw,2rem);color:var(--orange);display:block;line-height:1;margin-bottom:.2rem" class="kpi-n" data-target="60">60</span>
           <span style="font-size:.58rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--md);display:block;margin-bottom:.5rem">lojas · 8,3%</span>
           <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:.4rem">
             <span style="display:block;font-size:.6rem;color:rgba(255,255,255,.4);line-height:1.6">Média <strong style="color:var(--tl)">297 L</strong><br>Mediana <strong style="color:var(--tl)">272 L</strong><br><span class="hide-mobile">Range <strong style="color:var(--tl)">205–710 L</strong></span></span>
@@ -704,7 +705,7 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--t
 
         <div class="kpi-block" style="padding:1rem 1.25rem">
           <span style="font-size:.55rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);display:block;margin-bottom:.4rem">Middle</span>
-          <span style="font-family:'Libre Caslon Text',serif;font-size:clamp(1.6rem,4vw,2rem);color:var(--tl);display:block;line-height:1;margin-bottom:.2rem">430</span>
+          <span style="font-family:'Libre Caslon Text',serif;font-size:clamp(1.6rem,4vw,2rem);color:var(--tl);display:block;line-height:1;margin-bottom:.2rem" class="kpi-n" data-target="430">430</span>
           <span style="font-size:.58rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--md);display:block;margin-bottom:.5rem">lojas · 59,8%</span>
           <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:.4rem">
             <span style="display:block;font-size:.6rem;color:rgba(255,255,255,.4);line-height:1.6">Média <strong style="color:var(--tl)">112 L</strong><br>Mediana <strong style="color:var(--tl)">100 L</strong><br><span class="hide-mobile">Range <strong style="color:var(--tl)">60–200 L</strong></span></span>
@@ -713,7 +714,7 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--t
 
         <div class="kpi-block" style="padding:1rem 1.25rem">
           <span style="font-size:.55rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);display:block;margin-bottom:.4rem">Bottom</span>
-          <span style="font-family:'Libre Caslon Text',serif;font-size:clamp(1.6rem,4vw,2rem);color:var(--tl);display:block;line-height:1;margin-bottom:.2rem">229</span>
+          <span style="font-family:'Libre Caslon Text',serif;font-size:clamp(1.6rem,4vw,2rem);color:var(--tl);display:block;line-height:1;margin-bottom:.2rem" class="kpi-n" data-target="229">229</span>
           <span style="font-size:.58rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--md);display:block;margin-bottom:.5rem">lojas · 31,8%</span>
           <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:.4rem">
             <span style="display:block;font-size:.6rem;color:rgba(255,255,255,.4);line-height:1.6">Média <strong style="color:var(--tl)">33 L</strong><br>Mediana <strong style="color:var(--tl)">40 L</strong><br><span class="hide-mobile">Inclui <strong style="color:var(--tl)">31</strong> sem coleta</span></span>
@@ -744,7 +745,7 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--t
           <span class="kpi-x">Equivalente a 6.800 piscinas olímpicas sem contaminação</span>
         </div>
         <div class="kpi-block">
-          <span class="kpi-n" style="white-space:nowrap;display:block" data-target="1710" data-fmt="dot" data-suf=" t">1.710 t</span>
+          <span class="kpi-n" style="white-space:nowrap;display:block" data-target="1710" data-suf=" t">1.710 t</span>
           <span class="kpi-l">Carbono evitado</span>
           <span class="kpi-x">O mesmo que retirar 370 carros das ruas por um ano</span>
         </div>
@@ -857,7 +858,7 @@ function animateCounters(screenEl) {
     function tick(now) {
       const p = Math.min((now - t0) / dur, 1);
       const v = (1 - Math.pow(1 - p, 3)) * target;
-      let s = fmt === 'dot' ? Math.round(v).toLocaleString('pt-BR') : dec > 0 ? v.toFixed(dec).replace('.', ',') : Math.round(v).toLocaleString('pt-BR');
+      let s = dec > 0 ? v.toFixed(dec).replace('.', ',') : Math.round(v).toLocaleString('pt-BR');
       el.textContent = pre + s + suf;
       if (p < 1) requestAnimationFrame(tick);
     }
