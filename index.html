@@ -668,20 +668,60 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--t
     </div>
   </div>
 
-  <!-- TELA 9 — FINANCEIRO -->
-  <div class="screen light" data-screen="9">
-    <div class="wn">
-      <p class="label">Eficiência econômica</p>
-      <h2 class="h2">Custo caindo.<br>Receita crescendo.</h2>
-      <p class="body" style="color:var(--ml)">Ao longo dos 12 meses, a operação ficou mais eficiente — com 40% de queda no custo de RSU e 8x mais receita com óleo vegetal.</p>
-      <div style="display:flex;gap:1.5rem;margin:.75rem 0 1rem;font-size:.7rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase">
-        <span style="display:flex;align-items:center;gap:.4rem;color:#888780"><span style="width:20px;height:2px;background:rgba(255,150,80,0.85);border-radius:2px;display:inline-block"></span>Custo RSU</span>
-        <span style="display:flex;align-items:center;gap:.4rem;color:#888780"><span style="width:20px;height:2px;background:#8AA5FF;border-radius:2px;display:inline-block"></span>Receita Óleo Vegetal</span>
+  <!-- TELA 9 — POTENCIAL ÓLEO -->
+  <div class="screen dark" data-screen="9">
+    <div class="w">
+      <p class="label">Potencial do óleo vegetal</p>
+      <h2 class="h2" style="max-width:600px">Um ano de dados.<br>Agora é escalar.</h2>
+      <p class="body" style="margin-bottom:1.75rem">Com 12 meses de operação, mapeamos o padrão de cada loja. Sabemos quem performa, quem tem espaço para crescer — e quanto isso vale.</p>
+
+      <!-- 4 grupos -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;width:100%">
+
+        <div class="kpi-block" style="border-color:rgba(255,186,134,.4);background:rgba(255,186,134,.06)">
+          <span style="font-size:.6rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:.75rem">⬆ Top performers</span>
+          <span class="kpi-n" style="color:var(--orange);font-size:clamp(1.4rem,2.5vw,2rem)">60</span>
+          <span class="kpi-l">lojas · 8,3%</span>
+          <div style="margin-top:.75rem;border-top:1px solid rgba(255,255,255,.08);padding-top:.75rem">
+            <span style="display:block;font-size:.68rem;color:rgba(255,255,255,.4);line-height:1.8">Média <strong style="color:var(--tl)">297 L</strong><br>Mediana <strong style="color:var(--tl)">272 L</strong><br>Range <strong style="color:var(--tl)">205–710 L</strong></span>
+          </div>
+        </div>
+
+        <div class="kpi-block">
+          <span style="font-size:.6rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);display:block;margin-bottom:.75rem">Middle</span>
+          <span class="kpi-n" style="font-size:clamp(1.4rem,2.5vw,2rem)">430</span>
+          <span class="kpi-l">lojas · 59,8%</span>
+          <div style="margin-top:.75rem;border-top:1px solid rgba(255,255,255,.08);padding-top:.75rem">
+            <span style="display:block;font-size:.68rem;color:rgba(255,255,255,.4);line-height:1.8">Média <strong style="color:var(--tl)">112 L</strong><br>Mediana <strong style="color:var(--tl)">100 L</strong><br>Range <strong style="color:var(--tl)">60–200 L</strong></span>
+          </div>
+        </div>
+
+        <div class="kpi-block">
+          <span style="font-size:.6rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);display:block;margin-bottom:.75rem">Bottom</span>
+          <span class="kpi-n" style="font-size:clamp(1.4rem,2.5vw,2rem)">198</span>
+          <span class="kpi-l">lojas · 27,5%</span>
+          <div style="margin-top:.75rem;border-top:1px solid rgba(255,255,255,.08);padding-top:.75rem">
+            <span style="display:block;font-size:.68rem;color:rgba(255,255,255,.4);line-height:1.8">Média <strong style="color:var(--tl)">37 L</strong><br>Mediana <strong style="color:var(--tl)">40 L</strong><br>Range <strong style="color:var(--tl)">1–59 L</strong></span>
+          </div>
+        </div>
+
+        <div class="kpi-block" style="border-color:rgba(255,255,255,.06)">
+          <span style="font-size:.6rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.25);display:block;margin-bottom:.75rem">⚠ Zero coleta</span>
+          <span class="kpi-n" style="color:rgba(255,255,255,.35);font-size:clamp(1.4rem,2.5vw,2rem)">31</span>
+          <span class="kpi-l">lojas · 4,3%</span>
+          <div style="margin-top:.75rem;border-top:1px solid rgba(255,255,255,.08);padding-top:.75rem">
+            <span style="display:block;font-size:.68rem;color:rgba(255,255,255,.25);line-height:1.8">Nenhuma coleta<br>em fev/26<br>&nbsp;</span>
+          </div>
+        </div>
+
       </div>
-      <div style="position:relative;width:100%;height:280px;background:#F9EDE4;border:1px solid rgba(255,186,134,0.2);border-radius:16px;padding:.75rem 10px">
-        <canvas id="chartFinanceiro" style="display:block;width:100%;height:100%"></canvas>
+
+      <!-- Upside box -->
+      <div class="hl" style="max-width:100%;margin-top:1.25rem;padding:1rem 1.5rem">
+        <p style="font-size:.78rem;font-weight:400;color:rgba(255,255,255,.75);margin-bottom:.35rem">E se o middle fosse top? O bottom, middle? E o zero, bottom?</p>
+        <p style="font-size:.82rem;font-weight:300;color:rgba(255,255,255,.5)">O repasse sobe de <strong style="color:var(--tl)">R$ 163.639</strong> para <strong style="color:var(--orange)">R$ 380.560</strong> — só ajustando o que já existe. Mas para chegar lá, precisamos trabalhar juntos: quanto mais a Musa conhecer cada loja, mais rápido desbloqueamos esse potencial.</p>
       </div>
-      <p style="font-size:.68rem;color:var(--ml);margin-top:.75rem;letter-spacing:.04em">Valores indicativos · Abr/2025 – Mar/2026</p>
+
     </div>
   </div>
 
@@ -836,7 +876,6 @@ function goTo(n) {
       updateUI();
       animateCounters(to);
       if (n === 4) setTimeout(initChartColetas, 100);
-      if (n === 9) setTimeout(initChartFinanceiro, 100);
       if (n === 6) setTimeout(initMapPulse, 200);
       setTimeout(() => { from.classList.remove('exit-left'); animating = false; }, 550);
     });
@@ -955,6 +994,15 @@ function initChartColetas() {
 
 updateUI();
 animateCounters(getScreen(1));
+
+// Mobile: adiciona espaçador DOM real no final de cada tela para não ficar atrás da nav
+if (window.innerWidth <= 700) {
+  document.querySelectorAll('.screen').forEach(screen => {
+    const spacer = document.createElement('div');
+    spacer.style.cssText = 'width:100%;height:120px;flex-shrink:0;';
+    screen.appendChild(spacer);
+  });
+}
 </script>
 </body>
 </html>
