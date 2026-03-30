@@ -306,8 +306,10 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--t
     -webkit-overflow-scrolling: touch;
     padding: 4.5rem 1.25rem calc(220px + env(safe-area-inset-bottom));
   }
-  /* Cover centralizada no mobile */
-  [data-screen="1"] { justify-content: center; }
+  /* Cover e encerramento centralizados no mobile */
+  [data-screen="1"], [data-screen="12"] { justify-content: center; }
+  /* Botão menor no mobile */
+  .btn-cta { padding: .65rem 1.5rem; font-size: .8rem; }
 
   /* Nav: centralizada, sem offset de scrollbar, compacta, acima da safe area */
   .nav {
